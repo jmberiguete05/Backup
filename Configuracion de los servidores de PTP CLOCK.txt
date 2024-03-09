@@ -1,0 +1,62 @@
+
+HUA_HAIN_PE_1
+---
+ptp-adaptive enable
+ptp-adaptive device-type client
+ptp-adaptive local-ip 172.23.76.18
+ptp-adaptive acr unicast-negotiate enable
+ptp-adaptive remote-server1-ip 172.23.81.66
+ptp-adaptive remote-server2-ip 172.23.81.98
+clock source ptp synchronization enable
+clock source ptp priority 1
+clock source ptp ssm prc
+
+
+----- Cambiamos los servidores de PTP
+ptp-adaptive enable
+ptp-adaptive device-type client
+ptp-adaptive local-ip 172.23.76.18
+ptp-adaptive acr unicast-negotiate enable
+ptp-adaptive remote-server1-ip 172.23.81.74   ---> Herrera
+ptp-adaptive remote-server2-ip 172.23.81.98   ---> Bani
+
+
+//////////////////////////////
+
+En equipo cisco ---> Ejemplo: PLQE_903_1
+
+Primero eliminamos o desabilitamos la configuracion de ptp clock ordinary domain 0 y luego realizamos la configuracion
+
+* Para eliminar la configuracion ejecutamo [ no ptp clock ordinary domain 0 ] 
+-----
+ptp clock ordinary domain 0
+priority1 200
+priority2 200
+servo network-type High-Jitter
+clock-port Claro slave
+transport ipv4 unicast interface Lo1588 negotiation
+clock source 172.23.81.74
+
+
+
+
+//////////////////
+
+<HUA_SCP6_910_1>disp current-configuration | b ptp  ==== > ver configuracion especifica.
+
+----
+ptp-adaptive enable
+ptp-adaptive device-type client
+ptp-adaptive local-ip 172.23.247.33
+ptp-adaptive acr unicast-negotiate enable
+ptp-adaptive remote-server1-ip 172.23.81.74
+ptp-adaptive remote-server2-ip 172.23.81.98
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,66 @@
+d rtr/1 if/* 
+d rtr/1 ldp *
+****d rtr/1 ldp nbr/*
+d rtr/1 ldp nbr/* adj/* 
+d rtr/1 vrf/* slu/* 
+d rtr/1 mpls
+d Rtr/1 Mpls UserFec/*
+d rtr/1 ospf *
+d rtr/1 rdb/* 
+d rtr/1 fwd/*
+d rtr/1 tcp *
+d Lp/* Eng Fcrc Pqc 
+d rtr/1 if/* atmmpe ac/*
+d rtr/1 bgp *
+d -p -n rtr/1 bgp peer/* desc 
+d -p rtr/1 bgp
+
+d atmif/21 ca 
+d atmif/21 vcc/0.50 tm
+d atmif/21 statistics
+d atmif/21 vcc/0.50
+d atmif/21 vcc/0.50 statistics
+
+**********************************************************************************
+
+
+-Verificar cantidad de conexiones disponibles en el “subConnectionPoolAvailable” en el “FrameCoreResourceControl” de la ingeniería de la tarjeta 2:
+
+
+drtpt1> d lp/2 eng fcrc 
+==|===============================================
+ #|                             DRTPT1            
+  |                             Lp/2 Eng Fcrc     
+==|=============================(A)===============
+ 1|subConnectionPoolAvailable   0                 
+ 2|subConnectionPoolUsage       4096              
+ 3|lnnConnectionPoolAvailable   244               
+ 4|lnnConnectionPoolUsage       12                
+
+drtpt1> d lp/10 eng fcrc          
+==|===============================================
+ #|                             DRTPT1            
+  |                             Lp/10 Eng Fcrc    
+==|=============================(A)===============
+ 1|subConnectionPoolAvailable   125               
+ 2|subConnectionPoolUsage       899               
+ 3|lnnConnectionPoolAvailable   248               
+ 4|lnnConnectionPoolUsage       8                 
+
+
+-Verificar condición conexiones MPLS. Confirmar que no hayan unreacheable FECs y que las adyacencias LDP estén operacional:
+
+drtpt1> d rtr/1 mpls
+drtpt1> d rtr/1 ldp nbr/*
+caqpp1> d rtr/1 mpls
+caqpp1> d rtr/1 ldp nbr/*
+
+
+drtpt1> d -p rtr/1 if/* atmmpe ac/*
+caqpp1> d -p rtr/1 if/* atmmpe ac/*
+
+
+-Verificar conectividad IP con nodos trabajados:
+
+
+drtpt1> ping -ip(172.22.0.49) rtr/1 icmp

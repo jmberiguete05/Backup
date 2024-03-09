@@ -1,0 +1,143 @@
+Pasos para cargar una imagen a un ASR 903
+
+
+1 primer paso es cambiar el registro 
+
+config-register 0x2102
+end
+wr
+
+2-poner a bootear el router por la bootflash que contiene la imagen
+
+conf t
+no boot system flash bootflash:asr903rsp1-universalk9_npe.03.16.01a.S.155-3.S1a-ext.bin
+boot system flash bootflash:Image/packages.conf
+end
+wr 
+
+3-confirmar antes del reinicio que va a bootear de la location correcta
+
+
+NISI_903_1#show  bootvar 
+BOOT variable = bootflash:Image/packages.conf,1;
+CONFIG_FILE variable = 
+BOOTLDR variable does not exist
+Configuration register is 0x2 (will be 0x2102 at next reload)
+------------------------------------
+en un 7600
+boot device module 5
+boot device module 6
+boot bootldr bootdisk:boot device module 5 
+
+En Rommonitor
+dev ====>como se llma las particiones
+dir0: ===>ver archivo
+
+rommon> confreg 0x2102
+
+-------------
+--->Pasar imagen A USB para copiar en otra controladora
+copy bootflash:Image/asr903rsp1-universalk9_npe.03.18.06.SP.156-2.SP6-ext.bin usb:
+
+boot usb:asr903rsp1-universalk9_npe.03.18.06.SP.156-2.SP6-ext.bin 
+
+GBIN_903_1#dir bootflash:Image  ----------------- Con este comando se ve la imagen que esta corriendo
+
+<+===========>Para configuar el registro=====>
+conf term
+Configuration-register 0x2102 
+wr
+boot system flash sup-bootdisk:c7600rsp72043-adventerprisek9-mz.122-33.SRE14.bin,1;
+wr
+
+====>1 er paso=Validamos que la imagen este cargada para la tarjeta activa(sup-bootdisk:) y stanbay(slavesup-bootdisk:) .bin & .pkg, validamos que tenga=========<>
+el mismo peso.
+
+ZFMA_uPE_1#  dir sup-bootdisk:      
+Directory of sup-bootdisk:/
+
+    1  -rw-    41584640  Aug 21 2013 16:32:14 -04:00  c7600-fpd-pkg.122-33.SRE7a.pkg
+    2  -rw-    33554432  Jun 18 2017 00:51:56 -04:00  sea_log.dat
+    3  -rw-    41594880  Jun 15 2017 23:23:28 -04:00  c7600-fpd-pkg.122-33.SRE14.pkg
+    4  -rw-   150270884  Jun 15 2017 23:50:20 -04:00  c7600rsp72043-adventerprisek9-mz.122-33.SRE14.bin
+    5  -rw-   148301732  Aug 21 2013 16:05:12 -04:00  c7600rsp72043-advipservicesk9-mz.122-33.SRE7a.bin
+
+512090112 bytes total (96763904 bytes free)
+ZFMA_uPE_1#  dir slavesup-bootdisk: 
+Directory of slavesup-bootdisk:/
+
+    1  -rw-   148301732  Mar 24 2015 17:06:40 -04:00  c7600rsp72043-advipservicesk9-mz.122-33.SRE7a.bin
+    2  -rw-    41584640  Mar 24 2015 17:25:42 -04:00  c7600-fpd-pkg.122-33.SRE7a.pkg
+    3  -rw-    33554432  Mar 24 2015 17:29:20 -04:00  sea_log.dat
+    4  -rw-   150270884  Jul 10 2017 16:37:10 -04:00  c7600rsp72043-adventerprisek9-mz.122-33.SRE14.bin
+    5  -rw-    41594880  Jul 10 2017 16:40:54 -04:00  c7600-fpd-pkg.122-33.SRE14.pkg
+    6  -rw-           0   Jan 7 2000 17:20:12 -04:00  crashinfo_20000107-212013-UTC
+
+512081920 bytes total (96755712 bytes free)
+
+* si no esta cargada copiamos:copy sup-bootdisk:c7600rsp72043-adventerprisek9-mz.122-33.SRE14.bin slavesup-bootdisk:
+
+2-->Luego validamos el registro que este que indique de donde va a bootear
+
+ZFMA_uPE_1#show  bootvar           
+BOOT variable = sup-bootdisk:c7600rsp72043-adventerprisek9-mz.122-33.SRE14.bin,1;
+CONFIG_FILE variable = 
+BOOTLDR variable = 
+Configuration register is 0x2102
+
+Standby BOOT variable = sup-bootdisk:c7600rsp72043-adventerprisek9-mz.122-33.SRE14.bin,1;
+Standby CONFIG_FILE variable = 
+Standby BOOTLDR variable = 
+Standby Configuration register is 0x2102 
+
+3---->Luego reiniciamos la tarjeta controladora para que suba con la imagen correcta, si no sube con la imagen correcta, quiere decir que esta corrompida.
+la est
+
+ZFMA_uPE_1#hw-module module 5 reset 
+Proceed with reset of standby supervisor? [confirm]
+% reset issued for standby supervisor
+
+ZFMA_uPE_1#
+000327: Aug 10 17:12:21.602 AST: %RF-SP-5-RF_TERMINAL_STATE: Terminal state reached for (SSO)
+ZFMA_uPE_1#  
+ZFMA_uPE_1#        sh redundancy 
+Redundant System Information :
+------------------------------
+       Available system uptime = 3 hours, 26 minutes
+Switchovers system experienced = 0
+              Standby failures = 2
+        Last switchover reason = none
+
+                 Hardware Mode = Duplex
+    Configured Redundancy Mode = sso
+     Operating Redundancy Mode = sso
+              Maintenance Mode = Disabled
+                Communications = Up
+
+Current Processor Information :
+-------------------------------
+               Active Location = slot 6
+        Current Software state = ACTIVE
+       Uptime in current state = 3 hours, 26 minutes
+                 Image Version = Cisco IOS Software, c7600rsp72043_rp Software (c7600rsp72043_rp-ADVENTERPRISEK9-M), Version 12.2(33)SRE14, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2016 by Cisco Systems, Inc.
+Compiled Fri 04-Mar-16 06:27 by prod_rel_team
+                          BOOT = sup-bootdisk:c7600rsp72043-adventerprisek9-mz.122-33.SRE14.bin,1;
+                   CONFIG_FILE = 
+                       BOOTLDR = 
+        Configuration register = 0x2102
+
+Peer Processor Information :
+----------------------------
+              Standby Location = slot 5
+        Current Software state = STANDBY HOT 
+       Uptime in current state = 0 minutes
+                 Image Version = Cisco IOS Software, c7600rsp72043_rp Software (c7600rsp72043_rp-ADVENTERPRISEK9-M), Version 12.2(33)SRE14, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2016 by Cisco Systems, Inc.
+Compiled Fri 04-Mar-16 06:27 by prod_rel_team
+                          BOOT = sup-bootdisk:c7600rsp72043-adventerprisek9-mz.122-33.SRE14.bin,1;
+                   CONFIG_FILE = 
+                       BOOTLDR = 
+        Configuration register = 0x2102

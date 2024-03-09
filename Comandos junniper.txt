@@ -1,0 +1,28 @@
+
+
+td23742@JUN-30MZ-BRAS-1-RE1> show chassis alarms   
+1 alarms currently active
+Alarm time               Class  Description
+2019-12-12 12:08:36 AST  Minor  Backup RE Active  ?----------Alarma en la controladora
+
+
+show chassis routing-engine   ---<valida el estado de las controladoras
+show system uptime no-forwarding-->validar el tiempo en servicio
+show version detail no-forwarding---->ver la modelo equipo y version software
+show system core-dumps no-forwarding---->ver imagen
+show chassis alarms no-forwarding
+show chassis hardware detail no-forwarding
+show chassis routing-engine no-forwarding---->ver utilizacion del cpu
+show chassis environment no-forwarding---->ver temperatura de tarjetas/estado de fan
+show system processes extensive no-forwarding---->ver los procesos que se estan corriendo
+show pfe statistics error
+show pfe statistics traffic
+show chassis firmware no-forwarding
+show chassis fpc detail
+show system boot-messages  no-forwarding----->detalles del cpu
+show system storage no-forwarding--->uso de almacenamiento
+show system virtual-memory no-forwarding
+show system buffer no-forwarding
+show system queues no-forwarding--->ver trafico y drop de paquetes
+show system statistics no-forwarding
+show interfaces extensive no-forwarding---->informacion general de todas las interfaces
